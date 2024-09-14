@@ -1,0 +1,179 @@
+# 10- microservice  Application
+
+pipeline {
+    agent any
+	
+    
+
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: 'latest', url: 'https://github.com/rajesh319/10-microservices-app.git'
+            }
+        }
+        
+       
+        
+        stage('adservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                                 sh "docker build -t rajesh947/adservice:latest src/adservice"
+                                 sh "docker push rajesh947/adservice:latest"
+								 sh " docker rmi rajesh947/adservice:latest"
+                        
+                    }
+                }
+            }
+        }
+		
+		stage('cartservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                                 sh "docker build -t rajesh947/cartservice:latest src/cartservice/src"
+                                 sh "docker push rajesh947/cartservice:latest"
+								 sh " docker rmi rajesh947/cartservice:latest"
+                    }
+                }
+            }
+        }
+		
+		stage('checkoutservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                          
+                                 sh "docker build -t rajesh947/checkoutservice:latest src/checkoutservice"
+                                 sh "docker push rajesh947/checkoutservice:latest"
+								 sh " docker rmi rajesh947/checkoutservice:latest"
+                        
+                    }
+                }
+            }
+        }
+		
+		stage('currencyservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                                 sh "docker build -t rajesh947/currencyservice:latest src/currencyservice"
+                                 sh "docker push rajesh947/currencyservice:latest"
+								 sh " docker rmi rajesh947/currencyservice:latest"
+                        
+                    }
+                }
+            }
+        }
+        
+		stage('emailservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                          
+                                 sh "docker build -t rajesh947/emailservice:latest src/emailservice"
+                                 sh "docker push rajesh947/emailservice:latest"
+								 sh " docker rmi rajesh947/emailservice:latest"
+                        
+                    }
+                }
+            }
+        }
+		
+		stage('frontend') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                         
+                                 sh "docker build -t rajesh947/frontend:latest src/frontend"
+                                 sh "docker push rajesh947/frontend:latest"
+								 sh " docker rmi rajesh947/frontend:latest"
+                        
+                    }
+                }
+            }
+        }
+		
+		stage('loadgenerator') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                          
+                                 sh "docker build -t rajesh947/loadgenerator:latest src/loadgenerator"
+                                 sh "docker push rajesh947/loadgenerator:latest"
+								 sh " docker rmi rajesh947/loadgenerator:latest"
+                        
+                    }
+                }
+            }
+        }
+		
+		stage('paymentservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                          
+                                 sh "docker build -t rajesh947/paymentservice:latest src/paymentservice"
+                                 sh "docker push rajesh947/paymentservice:latest"
+								  sh " docker rmi rajesh947/paymentservice:latest"
+                        
+                    }
+                }
+            }
+        }
+        
+		stage('productcatalogservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                          
+                                 sh "docker build -t rajesh947/productcatalogservice:latest src/productcatalogservice"
+                                 sh "docker push rajesh947/productcatalogservice:latest"
+								 sh " docker rmi rajesh947/productcatalogservice:latest"
+                        
+                    }
+                }
+            }
+        }
+		
+		stage('recommendationservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                          
+                                 sh "docker build -t rajesh947/recommendationservice:latest src/recommendationservice"
+                                 sh "docker push rajesh947/recommendationservice:latest"
+								 sh " docker rmi rajesh947/recommendationservice:latest"
+                        
+                    }
+                }
+            }
+        }
+		
+		stage('shippingservice') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                          
+                                 sh "docker build -t rajesh947/shippingservice:latest src/shippingservice"
+                                 sh "docker push rajesh947/shippingservice:latest"
+								 sh " docker rmi rajesh947/shippingservice:latest"
+                        
+                    }
+                }
+            }
+        }
+        
+        
+        	stage('K8-Deploy') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: 'my-EKS-1', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://155F3054E8C455F53C33DA987D73BD17.yl4.ap-south-1.eks.amazonaws.com') {
+                         sh 'kubectl apply -f deployment-service.yml'
+                         sh 'kubectl get pods '
+                         sh 'kubectl get svc'
+                }
+            }
+        }
+        
+    }
+}
